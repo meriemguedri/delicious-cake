@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block title %}Produkte{% endblock %}
+{% block content %}
+
+<h1>Unsere Backwaren</h1>
+
+<!-- Kategorie Buttons -->
+<div class="category-buttons">
+    <a href="{% url 'home' %}"
+       class="category-btn {% if not selected_category %}active{% endif %}">
+        Alle
+    </a>
+    {% for category in categories %}
+    <a href="?category={{ category.id }}"
+       class="category-btn {% if selected_category == category.id|stringformat:'s' %}active{% endif %}">
+        {{ category.name }}
+    </a>
+    {% endfor %}
+</div>
+
+<form class="search-form" method="get">
+    <input type="text" name="q" value="{{ query }}"
+           placeholder="Suche nach Name, Beschreibung...">
+    <select name="stars">
+        <option value="">Alle Bewertungen</option>
+        <option value="1">1&#9733; und mehr</option>
+        <option value="2">2&#9733; und mehr</option>
+        <option value="3">3&#9733; und mehr</option>
+        <option value="4">4&#9733; und mehr</option>
+        <option value="5">Nur 5&#9733;</option>
+    </select>
+    <button type="submit">Suchen</button>
+    <a class="btn-link" href="{% url 'home' %}">Zurücksetzen</a>
+</form>
+
+<div class="product-grid">
+    {% for product in products %}
+    <div class="product-card">
+        <a href="{% url 'product_detail' product.pk %}">
+            <img src="{{ product.image.url }}" alt="{{ product.name }}">
+        </a>
+        <h2><a href="{% url 'product_detail' product.pk %}">{{ product.name }}</a></h2>
+        <p class="price">{{ product.price }} &#8364;</p>
+        <p>&#11088; {{ product.average_rating|floatformat:1 }}</p>
+    </div>
+    {% empty %}
+    <p>Keine Produkte gefunden.</p>
+    {% endfor %}
+</div>
+
+{% endblock %}

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Delicious Cake – {% block title %}{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+
+<header class="header">
+    <div class="header-inner">
+
+        <!-- Logo links -->
+        <a href="{% url 'home' %}" class="logo">
+            <img src="{% static 'images/logo_cake.jpeg' %}"
+                 alt="Delicious Cake"
+                 class="logo-img">
+        </a>
+
+        <!-- Links rechts -->
+        <nav class="nav-links">
+            <a href="{% url 'home' %}">Shop</a>
+            <span class="nav-divider">|</span>
+
+            {% if user.is_authenticated %}
+                <a href="{% url 'cart' %}">&#127873; Warenkorb</a>
+                <span class="nav-divider">|</span>
+
+                <a href="{% url 'profile' %}" class="nav-username">
+                    {% if user.profile_picture %}
+                        <img src="{{ user.profile_picture.url }}" class="avatar">
+                    {% endif %}
+                    {{ user.username }}
+                </a>
+
+                {% if user.is_staff %}
+                    <span class="nav-divider">|</span>
+                    <a href="{% url 'cs_portal' %}" class="cs-btn">CS-Portal</a>
+                {% endif %}
+
+                <span class="nav-divider">|</span>
+                <form method="post" action="{% url 'logout' %}" style="display:inline">
+                    {% csrf_token %}
+                    <button class="logout-btn" type="submit">Logout</button>
+                </form>
+
+            {% else %}
+                <a href="{% url 'login' %}" class="nav-btn-outline">Login</a>
+                <a href="{% url 'signup' %}" class="nav-btn-filled">Registrieren</a>
+            {% endif %}
+        </nav>
+
+    </div>
+</header>
+
+<div class="content">
+    {% block content %}{% endblock %}
+</div>
+
+<footer class="footer">
+    <p>&#127856; Delicious Cake &copy; 2026 — Hausgemachte Backwaren mit Liebe gemacht</p>
+</footer>
+
+</body>
+</html>

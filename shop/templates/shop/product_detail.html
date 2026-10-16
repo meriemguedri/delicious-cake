@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% block title %}{{ product.name }}{% endblock %}
+{% block content %}
+
+<a class="btn-link" href="{% url 'home' %}">&#8592; Zurück</a>
+
+<div class="product-detail">
+    <img src="{{ product.image.url }}" alt="{{ product.name }}">
+    <div class="product-info">
+        <h1>{{ product.name }}</h1>
+        <p><strong>Preis:</strong> {{ product.price }} &#8364;</p>
+        <p><strong>Beschreibung:</strong> {{ product.description }}</p>
+        <p><strong>Geschmack:</strong> {{ product.flavor }}</p>
+        <p><strong>Anlass:</strong> {{ product.occasion }}</p>
+        <p><strong>Groesse:</strong> {{ product.size }}</p>
+        <a class="btn-link" href="{{ product.info_pdf.url }}" download>
+            PDF herunterladen
+        </a>
+
+        {% if user.is_authenticated %}
+            <form method="post" action="{% url 'add_to_cart' product.pk %}">
+                {% csrf_token %}
+                <input type="number" name="quantity" value="1" min="1">
+                <button type="submit">In den Warenkorb</button>
+            </form>
+        {% else %}
+            <p><a href="{% url 'login' %}">Einloggen</a> um zu kaufen.</p>
+        {% endif %}
+    </div>
+</div>
+
+<hr>
+<h2>Bewertungen</h2>
+
+{% if user.is_authenticated %}
+    <div class="form-container">
+        <h3>{% if user_review %}Bewertung bearbeiten{% else %}Bewertung schreiben{% endif %}</h3>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Speichern</button>
+        </form>
+        {% if user_review %}
+            <a class="btn-link" href="{% url 'delete_review' user_review.pk %}">
+                Bewertung loeschen
+            </a>
+        {% endif %}
+    </div>
+{% else %}
+    <p><a href="{% url 'login' %}">Einloggen</a> um eine Bewertung zu schreiben.</p>
+{% endif %}
+
+{% for review in reviews %}
+    <div class="review">
+        <strong>{{ review.user.username }}</strong>
+        <span class="stars">{{ review.stars }}&#9733;</span>
+        <p>{{ review.text }}</p>
+        <small>{{ review.created_at|date:"d.m.Y" }}</small>
+        {% if user.is_authenticated and review.user != user %}
+            <div class="review-actions">
+                <a href="{% url 'vote_review' review.pk 'helpful' %}">
+                    Hilfreich ({{ review.helpful_count }})
+                </a>
+                <a href="{% url 'vote_review' review.pk 'not_helpful' %}">
+                    Nicht hilfreich ({{ review.not_helpful_count }})
+                </a>
+                <a href="{% url 'report_review' review.pk %}">Melden</a>
+            </div>
+        {% endif %}
+        {% if user.is_staff %}
+            <div class="review-actions">
+                <a href="{% url 'cs_deactivate_review' review.pk %}">Deaktivieren</a>
+                <a href="{% url 'cs_delete_review' review.pk %}">Loeschen</a>
+            </div>
+        {% endif %}
+    </div>
+{% empty %}
+    <p>Noch keine Bewertungen.</p>
+{% endfor %}
+
+{% endblock %}

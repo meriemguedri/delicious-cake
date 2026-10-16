@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block title %}CS-Portal{% endblock %}
+{% block content %}
+
+<h1>Kunden-Service-Portal</h1>
+
+<h2>Produkte <a class="btn-link" href="{% url 'cs_add_product' %}">+ Neues Produkt</a></h2>
+
+{% for product in products %}
+    <div class="cs-product-item">
+        <span><strong>{{ product.name }}</strong> — {{ product.price }} &#8364;</span>
+        <a class="btn-link" href="{% url 'cs_edit_product' product.pk %}">Bearbeiten</a>
+    </div>
+{% endfor %}
+
+<hr>
+<h2>Gemeldete Bewertungen</h2>
+
+{% for report in reported_reviews %}
+    <div class="reported-review">
+        <strong>{{ report.review.user.username }}</strong>
+        ueber <em>{{ report.review.product.name }}</em>:
+        <p>"{{ report.review.text }}" — {{ report.review.stars }}&#9733;</p>
+        <small>Gemeldet von {{ report.user.username }}
+               am {{ report.created_at|date:"d.m.Y" }}</small>
+        <div class="review-actions">
+            <a href="{% url 'cs_deactivate_review' report.review.pk %}">Deaktivieren</a>
+            <a href="{% url 'cs_delete_review' report.review.pk %}">Loeschen</a>
+        </div>
+    </div>
+{% empty %}
+    <p>Keine gemeldeten Bewertungen.</p>
+{% endfor %}
+
+{% endblock %}

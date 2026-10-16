@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %}Mein Profil{% endblock %}
+{% block content %}
+
+<div class="form-container">
+    <h1>Mein Profil</h1>
+    {% if user.profile_picture %}
+        <img src="{{ user.profile_picture.url }}" class="avatar-large">
+    {% else %}
+        <p>Kein Profilbild vorhanden.</p>
+    {% endif %}
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Speichern</button>
+    </form>
+</div>
+
+{% endblock %}
